@@ -5,6 +5,6 @@
 
 void ksyms_load(void);
 
-void ksyms_lookup_addr(__u64 addr, const char **name, __u64 *offset);
+void ksyms_lookup_addr(__u64 addr, const char **name, __s64 *offset);
 
 #endif

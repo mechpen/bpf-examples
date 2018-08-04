@@ -8,7 +8,6 @@
 #include <linux/types.h>
 #include "log.h"
 
-#define KSYMS_FILE       
 #define MIN_KERN_ADDR    0x00ffffffffffffff
 #define MAX_KERN_ADDR    0xffffffffffffffff
 
@@ -16,20 +15,16 @@ static int ksyms_count;
 static __u64 *ksyms_addrs;
 static char **ksyms_names;
 
-void ksyms_lookup_addr(__u64 addr, const char **name, __u64 *offset)
+void ksyms_lookup_addr(__u64 addr, const char **name, __s64 *offset)
 {
     int l = 0, r = ksyms_count-1, m;
 
     if (addr < ksyms_addrs[l]) {
-        ERROR("addr %p too small", (void *)addr);
-        *name = "__min__";
-        *offset = ksyms_addrs[l] - addr;
-        return;
+        goto ret;
     }
     if (addr >= ksyms_addrs[r]) {
-        *name = ksyms_names[r];
-        *offset = addr - ksyms_addrs[r];
-        return;
+        l = r;
+        goto ret;
     }
 
     while (l + 1 < r) {
@@ -39,6 +34,7 @@ void ksyms_lookup_addr(__u64 addr, const char **name, __u64 *offset)
         else
             l = m;
     }
+ret:
     *name = ksyms_names[l];
     *offset = addr - ksyms_addrs[l];
 }

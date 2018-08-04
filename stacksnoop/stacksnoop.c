@@ -30,10 +30,11 @@ void process_data(void *data, int size)
 
     for (i = 0; i < BPF_MAX_STACK_DEPTH && stack[i] != 0; i++) {
         const char *name;
-	__u64 offset;
+        __s64 offset;
 
         ksyms_lookup_addr(stack[i], &name, &offset);
-        printf("    %p @ %s+0x%llx\n", (void *)stack[i], name, offset);
+        printf("    %p @ %s %s0x%llx\n", (void *)stack[i], name,
+               offset>=0 ? "+"    : "-", offset>=0 ? offset : -offset);
     }
 }
 
