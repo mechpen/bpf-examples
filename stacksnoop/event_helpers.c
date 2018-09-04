@@ -37,7 +37,7 @@ static inline int sys_perf_event_open(struct perf_event_attr *attr,
     return syscall(__NR_perf_event_open, attr, pid, cpu, group_fd, flags);
 }
 
-int event_attach_kprobe_dympmu(int bpf_fd, char *function)
+static int kprobe_dympmu(char *function)
 {
     int fd, type;
     struct perf_event_attr attr;
@@ -61,7 +61,7 @@ int event_attach_kprobe_dympmu(int bpf_fd, char *function)
     return fd;
 }
 
-int event_attach_kprobe_debugfs(int bpf_fd, char *function)
+static int kprobe_debugfs(char *function)
 {
     int fd, bytes;
     char buf[256];
@@ -110,9 +110,9 @@ void event_attach_kprobe(int bpf_fd, char *function)
 {
     int fd;
 
-    fd = event_attach_kprobe_dympmu(bpf_fd, function);
+    fd = kprobe_dympmu(function);
     if (fd < 0)
-        fd = event_attach_kprobe_debugfs(bpf_fd, function);
+        fd = kprobe_debugfs(function);
 
     if (ioctl(fd, PERF_EVENT_IOC_SET_BPF, bpf_fd) < 0)
         ERROR_EXIT("ioctl(SET_BPF): %s", strerror(errno));
